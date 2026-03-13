@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>חדר בריחה | פורטל מפעיל</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .hero {
+      min-height: 55vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 50% 0%, rgba(192,57,43,0.12), transparent),
+        radial-gradient(ellipse 40% 60% at 80% 100%, rgba(201,168,76,0.06), transparent);
+      pointer-events: none;
+    }
+
+    .hero__label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red-vivid);
+      font-weight: 600;
+      margin-bottom: 18px;
+      opacity: 0;
+      animation: fadeIn 0.6s 0.1s ease both;
+    }
+
+    .hero__title {
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 16px;
+      opacity: 0;
+      animation: fadeIn 0.6s 0.2s ease both;
+    }
+
+    .hero__title .line2 {
+      color: var(--red-vivid);
+      text-shadow: 0 0 60px rgba(192,57,43,0.5), 0 0 120px rgba(192,57,43,0.2);
+      animation: flicker 8s infinite 3s;
+    }
+
+    .hero__sub {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      max-width: 440px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+      opacity: 0;
+      animation: fadeIn 0.6s 0.3s ease both;
+    }
+
+    .hero__stats {
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeIn 0.6s 0.4s ease both;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat__num {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .stat__num .accent { color: var(--red-vivid); }
+
+    .stat__label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    .divider-stat {
+      width: 1px;
+      height: 40px;
+      background: var(--border-dark);
+      align-self: center;
+    }
+
+    /* Room cards section */
+    .rooms-section {
+      padding: 0 20px 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .rooms-label {
+      text-align: center;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .room-card__banner {
+      position: relative;
+    }
+
+    .room-card__banner-emoji {
+      font-size: 3.5rem;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 4px 20px rgba(0,0,0,0.5));
+    }
+
+    .room-card__banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 40%, rgba(10,10,15,0.7));
+    }
+
+    .room-card--elm:hover { box-shadow: 0 8px 40px rgba(192,57,43,0.25); }
+    .room-card--katzia:hover { box-shadow: 0 8px 40px rgba(50,130,80,0.2); }
+    .room-card--qa:hover { box-shadow: 0 8px 40px rgba(201,168,76,0.2); }
+
+    .room-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    /* Quick access section */
+    .quick-section {
+      padding: 0 20px 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .quick-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: var(--transition);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .quick-card:hover {
+      border-color: var(--border-red);
+      background: var(--bg-card-hover);
+    }
+
+    .quick-card__icon {
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+
+    .quick-card__title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .quick-card__sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="scroll-progress"></div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="site-logo">
+      <img src="logo.png" alt="Escape Room" class="site-logo__img">
+      <div class="site-logo__text">
+        <span class="site-logo__name">פורטל מפעיל</span>
+        <span class="site-logo__sub">ELM STREET &amp; THE BUTCHERY</span>
+      </div>
+    </a>
+    <button class="nav-toggle" aria-label="תפריט" aria-expanded="false">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="19" y2="6"/>
+        <line x1="3" y1="12" x2="19" y2="12"/>
+        <line x1="3" y1="18" x2="19" y2="18"/>
+      </svg>
+    </button>
+    <nav class="site-nav">
+      <a href="index.html" class="nav-link">🏠 ראשי</a>
+      <a href="elm-street.html" class="nav-link">🔪 אלם סטריט</a>
+      <a href="hakatzia.html" class="nav-link">🥩 הקצביה</a>
+      <a href="qa.html" class="nav-link nav-link--qa">💬 Q&A טלפוני</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero__label">פורטל תפעולי פנימי</div>
+  <img src="logo.png" alt="Escape Room — Elm Street & The Butchery" style="height: 90px; width: auto; filter: invert(1) brightness(0.65); margin-bottom: 20px; animation: fadeIn 0.6s 0.15s ease both; opacity: 0;">
+  <h1 class="hero__title">
+    כל הכלים<br>
+    <span class="line2">במקום אחד</span>
+  </h1>
+  <p class="hero__sub">מדריכי מפעיל, Q&A טלפוני, וצ'קליסטים לסידור חדר — הכל מוכן לפני כל משמרת.</p>
+  <div class="hero__stats">
+    <div class="stat">
+      <div class="stat__num"><span class="accent">2</span></div>
+      <div class="stat__label">חדרי בריחה</div>
+    </div>
+    <div class="divider-stat"></div>
+    <div class="stat">
+      <div class="stat__num"><span class="accent">60</span></div>
+      <div class="stat__label">דקות למשחק</div>
+    </div>
+    <div class="divider-stat"></div>
+    <div class="stat">
+      <div class="stat__num"><span class="accent">4</span></div>
+      <div class="stat__label">חדרים ב-escape</div>
+    </div>
+  </div>
+</section>
+
+<!-- ROOM CARDS -->
+<section class="rooms-section">
+  <div class="container">
+    <p class="rooms-label">בחר מדריך</p>
+    <div class="room-cards animate-stagger">
+
+      <!-- ELM STREET -->
+      <a href="elm-street.html" class="room-card room-card--elm">
+        <div class="room-card__banner room-card__banner--elm">
+          <span class="room-card__banner-emoji">🔪</span>
+        </div>
+        <div class="room-card__body">
+          <div class="room-meta">
+            <span class="badge badge--red">מפחיד גבוה</span>
+            <span class="badge badge--green">פעיל</span>
+          </div>
+          <h2 class="room-card__title">אלם סטריט</h2>
+          <p class="room-card__desc">חדר בריחה בנושא סיוט ברחוב אלם. 4 חדרים, 60 דקות, פרדי קרוגר כשחקן חי.</p>
+          <div class="room-card__footer">
+            <div class="room-card__cta">פתח מדריך ←</div>
+            <span class="badge badge--red">עד 10 שחקנים</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- HAKATZIA -->
+      <a href="hakatzia.html" class="room-card room-card--katzia">
+        <div class="room-card__banner room-card__banner--katzia">
+          <span class="room-card__banner-emoji">🥩</span>
+        </div>
+        <div class="room-card__body">
+          <div class="room-meta">
+            <span class="badge badge--gold">קריפי-מציאותי</span>
+            <span class="badge badge--green">פעיל</span>
+          </div>
+          <h2 class="room-card__title">הקצביה</h2>
+          <p class="room-card__desc">חדר בריחה עם תפאורה מציאותית וסיפור עמוק. לא מפחיד כמו אלם, יותר קריפי.</p>
+          <div class="room-card__footer">
+            <div class="room-card__cta">פתח מדריך ←</div>
+            <span class="badge badge--gold">עד 8 שחקנים</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Q&A -->
+      <a href="qa.html" class="room-card room-card--qa">
+        <div class="room-card__banner room-card__banner--qa">
+          <span class="room-card__banner-emoji">📞</span>
+        </div>
+        <div class="room-card__body">
+          <div class="room-meta">
+            <span class="badge badge--gold">טלפוני</span>
+          </div>
+          <h2 class="room-card__title">Q&A טלפוני</h2>
+          <p class="room-card__desc">מענה לשאלות נפוצות מלקוחות — גיל, מחיר, פחד, נגישות, ביטולים ועוד.</p>
+          <div class="room-card__footer">
+            <div class="room-card__cta" style="color: var(--gold);">פתח מדריך ←</div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- QUICK ACCESS -->
+<section class="quick-section">
+  <div class="container">
+    <h2 class="section-title"><span class="icon">⚡</span> גישה מהירה</h2>
+    <div class="quick-grid animate-stagger">
+      <a href="elm-street.html#checklist" class="quick-card">
+        <span class="quick-card__icon">✅</span>
+        <div>
+          <div class="quick-card__title">צ'קליסט אלם</div>
+          <div class="quick-card__sub">סידור לפני קבוצה</div>
+        </div>
+      </a>
+      <a href="hakatzia.html#checklist" class="quick-card">
+        <span class="quick-card__icon">✅</span>
+        <div>
+          <div class="quick-card__title">צ'קליסט קצביה</div>
+          <div class="quick-card__sub">סידור לפני קבוצה</div>
+        </div>
+      </a>
+      <a href="elm-street.html#briefing" class="quick-card">
+        <span class="quick-card__icon">🎙️</span>
+        <div>
+          <div class="quick-card__title">תדריך אלם</div>
+          <div class="quick-card__sub">נוסח לפני הכניסה</div>
+        </div>
+      </a>
+      <a href="qa.html#pricing" class="quick-card">
+        <span class="quick-card__icon">💰</span>
+        <div>
+          <div class="quick-card__title">מחירים והנחות</div>
+          <div class="quick-card__sub">מדריך תשלום</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 0.78rem; border-top: 1px solid var(--border-dark); position:relative; z-index:1;">
+  פורטל מפעיל פנימי — לשימוש צוות בלבד
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
