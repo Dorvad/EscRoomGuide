@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Q&A טלפוני | מדריך מפעיל</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .qa-header {
+      background: linear-gradient(180deg, rgba(100,80,10,0.3) 0%, transparent 100%);
+      padding: 48px 20px 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .qa-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(201,168,76,0.1), transparent);
+    }
+    .qa-header__icon { font-size: 3.5rem; display: block; margin-bottom: 12px; }
+    .qa-header__title {
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 0 40px var(--gold-glow);
+      margin-bottom: 8px;
+    }
+    .qa-header__sub { font-size: 0.9rem; color: var(--text-secondary); }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      margin-top: 8px;
+    }
+    .category-header__icon { font-size: 1.2rem; }
+    .category-header__title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .category-header__line {
+      flex: 1;
+      height: 1px;
+      background: var(--border-dark);
+    }
+
+    .qa-category { margin-bottom: 32px; }
+
+    .call-script {
+      background: linear-gradient(135deg, rgba(201,168,76,0.06), var(--bg-card));
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      font-size: 0.88rem;
+      line-height: 1.75;
+      color: var(--text-secondary);
+    }
+    .call-script .say {
+      color: var(--gold);
+      font-weight: 600;
+    }
+    .call-script .do {
+      color: var(--text-primary);
+      font-style: italic;
+    }
+
+    .escalate-box {
+      background: rgba(192,57,43,0.08);
+      border: 1px solid var(--border-red);
+      border-right: 4px solid var(--red-vivid);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: #e08070;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-top: 10px;
+    }
+
+    .top-bar {
+      background: rgba(201,168,76,0.07);
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--gold);
+      position: relative;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+<div class="scroll-progress"></div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="site-logo">
+      <img src="logo.png" alt="Escape Room" class="site-logo__img">
+      <div class="site-logo__text">
+        <span class="site-logo__name">פורטל מפעיל</span>
+        <span class="site-logo__sub">ELM STREET &amp; THE BUTCHERY</span>
+      </div>
+    </a>
+    <button class="nav-toggle" aria-label="תפריט">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="19" y2="6"/>
+        <line x1="3" y1="12" x2="19" y2="12"/>
+        <line x1="3" y1="18" x2="19" y2="18"/>
+      </svg>
+    </button>
+    <nav class="site-nav">
+      <a href="index.html" class="nav-link">🏠 ראשי</a>
+      <a href="elm-street.html" class="nav-link">🔪 אלם סטריט</a>
+      <a href="hakatzia.html" class="nav-link">🥩 הקצביה</a>
+      <a href="qa.html" class="nav-link active nav-link--qa">💬 Q&A טלפוני</a>
+    </nav>
+  </div>
+</header>
+
+<div class="top-bar">
+  ⚠️ לכל שאלה שאינה ברשימה, או מצב לא ברור — <strong>לדבר עם הבעלים לפני מענה</strong>
+</div>
+
+<div class="qa-header">
+  <span class="qa-header__icon">📞</span>
+  <h1 class="qa-header__title">מדריך Q&A טלפוני</h1>
+  <p class="qa-header__sub">מענה מהיר לשאלות נפוצות — ברור, עקבי, ומקצועי</p>
+</div>
+
+<main class="container" style="padding-top: 32px; padding-bottom: 60px;">
+
+  <!-- SEARCH -->
+  <div class="search-box animate-in">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" type="text" placeholder="חפש שאלה...">
+  </div>
+
+  <!-- FILTER TABS -->
+  <div class="filter-tabs animate-in">
+    <button class="filter-tab active" data-filter="all">הכל</button>
+    <button class="filter-tab" data-filter="age">גיל ילדים</button>
+    <button class="filter-tab" data-filter="scary">רמת פחד</button>
+    <button class="filter-tab" data-filter="pricing">מחיר</button>
+    <button class="filter-tab" data-filter="groups">קבוצות</button>
+    <button class="filter-tab" data-filter="ops">תפעול</button>
+    <button class="filter-tab" data-filter="special">מקרים מיוחדים</button>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- CATEGORY: גיל וילדים          -->
+  <!-- ══════════════════════════════ -->
+  <div class="qa-category animate-stagger" data-category="age">
+    <div class="category-header">
+      <span class="category-header__icon">👶</span>
+      <span class="category-header__title">גיל וילדים</span>
+      <div class="category-header__line"></div>
+    </div>
+    <div class="qa-list">
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>מאיזה גיל אפשר להיכנס?</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            לשאול תחילה: <strong>"בני כמה הילדים?"</strong><br><br>
+            אם מעל 10 — <strong>לומר שיכולים להיכנס</strong>. לא לציין גיל מינימום מוגדר כי אז זה ייראה להם לא מפחיד בכלל.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>ילד/ה רוצים להזמין לבד</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            לבקש לדבר עם אחד ההורים ולהסביר על <strong>התפאורה והפחד</strong>.<br><br>
+            <strong>אשראי — לקחת רק מההורים.</strong> אם שמו אשראי באתר — לבקש אישור מהורה שיודע על <strong>דמי הביטול</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>האם הקצביה/אלם מתאים לילדים?</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            לומר ש<strong>שיחקו אצלנו הרבה ילדים</strong>, אבל זה תלוי ברגישות של כל אחד. אם הילד מודע ורוצה מפחיד — מהניסיון שלנו לא הייתה בעיה.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- CATEGORY: רמת פחד              -->
+  <!-- ══════════════════════════════ -->
+  <div class="qa-category animate-stagger" data-category="scary">
+    <div class="category-header">
+      <span class="category-header__icon">👻</span>
+      <span class="category-header__title">רמת פחד</span>
+      <div class="category-header__line"></div>
+    </div>
+    <div class="qa-list">
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>כמה מפחיד?</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            יש רמות פחד — <strong>הם יכולים להחליט במקום</strong>. לא להגיד מראש מה יקרה.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>מה ההבדל בין אלם סטריט לקצביה מבחינת פחד?</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            <strong>קצביה</strong> — קריפי ומציאותי מבחינת תפאורה וסיפור.<br>
+            <strong>אלם סטריט</strong> — אם רוצים ממש מפחיד, זה אלם.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>האם יש זחילות ומעברים צרים?</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            <strong>אלם סטריט</strong> — זחילה ממש קטנה.<br>
+            <strong>קצביה</strong> — יש זחילה בסוף, אבל <strong>אפשר לדלג עליה</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>שואלים מה ההבדל בין טעות בכיוון לקצביה</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            לכתוב <strong>הערות</strong> שלא שיחקו ולשאול תמיד. <strong>תפאורה וחידות זה אותו חדר</strong>.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- CATEGORY: קבוצות              -->
+  <!-- ══════════════════════════════ -->
+  <div class="qa-category animate-stagger" data-category="groups">
+    <div class="category-header">
+      <span class="category-header__icon">👥</span>
+      <span class="category-header__title">קבוצות</span>
+      <div class="category-header__line"></div>
+    </div>
+    <div class="qa-list">
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>קבוצה גדולה — יותר מהמקסימום</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            <strong>אלם סטריט:</strong> ממליצים עד 10, אבל שיחקו אצלנו יותר ונהנו.<br>
+            <strong>קצביה:</strong> ממליצים עד 8, אבל שיחקו אצלנו יותר ונהנו.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>זוגות — חמישי, שישי ושבת</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            החל מ<strong>חמישי 18:00, שישי ושבת</strong>: החדר מוגבל ל-3 משתתפים, או לזוג <strong>במחיר של שלושה = 420 ₪</strong>.<br><br>
+            אם לא רוצים — להגיד להם להתקשר שעה לפני המשחק. אם לא יתפס — לאשר מחיר רגיל לזוג ללא הנחות נוספות.
+            <div class="escalate-box">
+              <span>⚠️</span>
+              <div>אם זוג לא רוצה לשלם מחיר של שלושה בסופ"ש — <strong>לדבר עם הבעלים</strong>.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>אחד החדרים תפוס — האם יש אלטרנטיבה?</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            אם <strong>אלם סטריט תפוס</strong> — להציע קצביה.<br>
+            אם <strong>קצביה תפוסה</strong> — להציע אלם.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- CATEGORY: מחיר והנחות         -->
+  <!-- ══════════════════════════════ -->
+  <div class="qa-category animate-stagger" data-category="pricing" id="pricing">
+    <div class="category-header">
+      <span class="category-header__icon">💰</span>
+      <span class="category-header__title">מחיר, הנחות, תשלום</span>
+      <div class="category-header__line"></div>
+    </div>
+    <div class="qa-list">
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>אפשר לשלב שובר עם הנחה?</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            <strong>אין כפל הנחות ומבצעים.</strong> אי אפשר לממש שוברים עם הנחה אחרת.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>מי שיוצא מהחדר — האם מקבל החזר?</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            <strong>אין החזר</strong> למי שיוצא מהחדר.
+            <div class="escalate-box">
+              <span>⚠️</span>
+              <div>אם זה קורה — <strong>לדבר עם הבעלים באותו רגע</strong>.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>מתי לחלק 50 ₪ מתנה?</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            לחלק <strong>50 ₪ מתנה</strong> בסיום החשבון.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>תשלום לקצביה</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            כשלוקחים תשלום לקצביה — <strong>להחזיק דלת שלא יראו את המסך של אלם</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>יש שוברים / הנחות בחשבון</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            <div class="escalate-box">
+              <span>⚠️</span>
+              <div><strong>לדבר עם הבעלים</strong> עד שתלמד לגמרי.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- CATEGORY: תפעול                -->
+  <!-- ══════════════════════════════ -->
+  <div class="qa-category animate-stagger" data-category="ops">
+    <div class="category-header">
+      <span class="category-header__icon">⚙️</span>
+      <span class="category-header__title">תפעול שוטף</span>
+      <div class="category-header__line"></div>
+    </div>
+    <div class="qa-list">
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>שחקנים פתחו משהו בטעות בחדר</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            להגיד לסגור / לא לגעת, ושכשיגיעו לחידה — נגיד להם.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>כפתור לא ביצע את כל הפעולות</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            <strong>לבצע ידנית</strong> את הפעולות שהיה צריך לעשות.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>מישהו יוצא באמצע החדר</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            לנסות להחזיר. אם לא — לשבת איתו ליד המצלמות.<br>
+            אם הולכים להבהיל — <strong>להגיד לו לחכות בחוץ ולסגור דלת</strong>. אחרי ההפחדה — להכניס אותו לראות בחזרה.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>להיכנס עם טלפון? בייביסיטר?</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            <strong>להיכנס בלי טלפון.</strong><br>
+            אם יש בייביסיטר — <strong>להשאיר אצלנו</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>מאחרים — מה עושים?</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            להגיד עד איזו שעה יש להם להיות בחדר (<strong>10 דקות לפני המשחק הבא</strong>). לנסות לאחר קצת את הקבוצה הבאה.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>מתי להדפיס אצבע?</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            <strong>20 דקות לפני משמרת</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>קצביה הגיעו בזמן שמדריך</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            להגיד להם <strong>דקה לחכות מחוץ לדלת</strong> — ושכבר נכניס אותם.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>רוצים להזמין לבוקר / צהריים</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            <div class="escalate-box">
+              <span>⚠️</span>
+              <div><strong>לדבר עם הבעלים</strong> — או להגיד שנעדכן שבוע לפני.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>סיום משחק — מה עושים?</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            <strong>לדבר איתם איך היה</strong> ולצלם אותם.<br>
+            אחרי שנכנסו לחדר — ללכת מהר לחדר מפעיל לוודא שלא קרה כלום, ואז לסדר לובי ושאר המתחם.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- CATEGORY: מקרים מיוחדים       -->
+  <!-- ══════════════════════════════ -->
+  <div class="qa-category animate-stagger" data-category="special">
+    <div class="category-header">
+      <span class="category-header__icon">🔧</span>
+      <span class="category-header__title">מקרים מיוחדים</span>
+      <div class="category-header__line"></div>
+    </div>
+    <div class="qa-list">
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>לקוחה בהריון</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            לומר ששיחקו אצלנו נשים בהריון, אבל <strong>כל אחת והרגישות שלה</strong>. יש התכופפויות כמו בכל חדר בריחה אחר.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>הורים שואלים אם מתאים לילדים</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            לומר ששיחקו אצלנו הרבה ילדים, אבל <strong>תלוי ברגישות של כל אחד</strong>. אם הילד מודע ורוצה מפחיד — מהניסיון שלנו לא הייתה בעיה.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>קרה משהו ללקוח</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            <strong>תמיד להיות בסדר</strong> ולדבר עם הבעלים.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>שאלה שאין לה תשובה ברשימה</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            להגיד ש<strong>תחזור אליהם</strong> ולשאול את הבעלים לפני מענה.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question">
+          <span class="q-icon">❓</span>
+          <span>יש שחקן מיוחד (כמו מפחיד)</span>
+          <span class="q-arrow">▼</span>
+        </button>
+        <div class="qa-answer">
+          <div class="qa-answer-inner">
+            לכתוב <strong>הערות</strong> בהזמנה.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CHECKLIST SECTION -->
+  <div class="divider"></div>
+  <div class="section animate-in">
+    <h2 class="section-title"><span class="icon">🧹</span> משימות שוטפות — לסמן בסיום כל קבוצה</h2>
+    <div class="checklist animate-stagger">
+      <div class="check-item" data-key="ops_1"><span class="check-box"></span>לובי, שירותים, פחים, לוקרים — לסדר אחרי שקבוצה נכנסת/יוצאת</div>
+      <div class="check-item" data-key="ops_2"><span class="check-box"></span>למלא חסר בעמדת קפה: נייר טואלט, מגבת, סבון</div>
+      <div class="check-item" data-key="ops_3"><span class="check-box"></span>לטאטא לובי, איזור קבלה וחדר ילדה</div>
+      <div class="check-item" data-key="ops_4"><span class="check-box"></span>לוודא דלת אלם, דלת חדר מפעיל, דלת מתחם — סגורות</div>
+      <div class="check-item" data-key="ops_5"><span class="check-box"></span>בדיקה בכל חדר אחרי סיום סידור</div>
+      <div class="check-item" data-key="ops_6"><span class="check-box"></span>לדבר עם לקוחות בסוף משחק ולצלם אותם</div>
+    </div>
+    <div style="margin-top: 16px; text-align: center;">
+      <button class="checklist-reset" style="background: var(--bg-card); border: 1px solid var(--border-dark); color: var(--text-muted); padding: 10px 20px; border-radius: var(--radius-md); cursor: pointer; font-family: var(--font-body); font-size: 0.82rem; transition: var(--transition);">
+        🔄 איפוס
+      </button>
+    </div>
+  </div>
+
+</main>
+
+<footer style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 0.78rem; border-top: 1px solid var(--border-dark); position:relative; z-index:1;">
+  פורטל מפעיל פנימי — לשימוש צוות בלבד
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

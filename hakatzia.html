@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>הקצביה | מדריך מפעיל</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .room-header {
+      background: linear-gradient(180deg, rgba(10,40,20,0.6) 0%, transparent 100%);
+      padding: 48px 20px 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .room-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(50,130,60,0.14), transparent);
+    }
+    .room-header__icon { font-size: 4rem; display: block; margin-bottom: 12px; }
+    .room-header__title {
+      font-size: clamp(2rem, 7vw, 3.5rem);
+      font-weight: 900;
+      color: #4ec97e;
+      text-shadow: 0 0 40px rgba(50,200,80,0.35);
+      margin-bottom: 8px;
+    }
+    .room-header__sub { font-size: 0.9rem; color: var(--text-secondary); }
+    .room-header__badges {
+      display: flex; gap: 8px; justify-content: center;
+      margin-top: 14px; flex-wrap: wrap;
+    }
+    .badge--green2 {
+      background: rgba(50,180,80,0.1);
+      color: #4ec97e;
+      border: 1px solid rgba(50,180,80,0.25);
+    }
+    .section-title--green::after { background: #4ec97e; }
+
+    /* Equipment */
+    .equipment-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+    }
+    .equipment-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      transition: var(--transition);
+    }
+    .equipment-card:hover { border-color: rgba(50,180,80,0.3); background: var(--bg-card-hover); }
+    .equipment-card__icon { font-size: 1.5rem; margin-bottom: 10px; display: block; }
+    .equipment-card__name { font-size: 0.88rem; font-weight: 700; margin-bottom: 6px; color: #4ec97e; }
+    .equipment-card__desc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; }
+
+    /* Room segment */
+    .room-segment {
+      background: var(--bg-card);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .room-segment__header {
+      background: linear-gradient(135deg, rgba(50,180,80,0.1), transparent);
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid var(--border-dark);
+      flex-wrap: wrap;
+    }
+    .room-segment__num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(50,180,80,0.15);
+      border: 2px solid rgba(50,180,80,0.35);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.9rem; flex-shrink: 0; color: #4ec97e;
+    }
+    .room-segment__title { font-size: 1.05rem; font-weight: 800; }
+    .room-segment__body { padding: 20px 22px; }
+
+    /* Mission */
+    .mission {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      margin-bottom: 12px;
+      transition: var(--transition);
+    }
+    .mission:last-child { margin-bottom: 0; }
+    .mission:hover { border-color: rgba(50,180,80,0.25); }
+    .mission__header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px; flex-wrap: wrap;
+    }
+    .mission__label {
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; color: #4ec97e;
+    }
+    .mission__title { font-size: 0.95rem; font-weight: 700; }
+    .mission__body { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.75; }
+    .mission__body strong { color: var(--text-primary); }
+    .mission__tip {
+      display: flex; gap: 8px; margin-top: 10px; padding: 8px 12px;
+      background: rgba(201,168,76,0.06); border-right: 3px solid var(--gold);
+      border-radius: 0 4px 4px 0; font-size: 0.82rem; color: var(--gold);
+    }
+
+    /* Op action */
+    .op-action {
+      background: rgba(50,180,80,0.06);
+      border: 1px solid rgba(50,180,80,0.2);
+      border-radius: var(--radius-md);
+      padding: 14px 16px; font-size: 0.85rem; color: #6dd89a;
+      display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px;
+    }
+    .op-action__icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+    /* Speech */
+    .speech-box {
+      background: linear-gradient(135deg, rgba(50,180,80,0.06), var(--bg-card));
+      border: 1px solid rgba(50,180,80,0.2);
+      border-right: 4px solid #4ec97e;
+      border-radius: var(--radius-md);
+      padding: 16px 18px; font-size: 0.88rem;
+      color: var(--text-secondary); line-height: 1.8;
+      margin-bottom: 12px; position: relative;
+    }
+    .speech-box::before {
+      content: '💬'; position: absolute; top: -10px; right: 14px; font-size: 1.2rem;
+    }
+    .speech-box em { color: var(--text-primary); font-style: normal; font-weight: 500; }
+
+    /* Sub steps */
+    .sub-steps { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .sub-step { display: flex; gap: 12px; font-size: 0.85rem; color: var(--text-secondary); align-items: flex-start; }
+    .sub-step__dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(50,180,80,0.5); flex-shrink: 0; margin-top: 7px;
+    }
+
+    /* Hearts */
+    .hearts-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 10px; margin-top: 10px;
+    }
+    .heart-card {
+      background: var(--bg-card); border: 1px solid rgba(192,57,43,0.2);
+      border-radius: var(--radius-md); padding: 14px; text-align: center;
+    }
+    .heart-card__icon { font-size: 1.6rem; display: block; margin-bottom: 6px; }
+    .heart-card__num { font-size: 0.72rem; font-weight: 700; color: var(--red-vivid); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+    .heart-card__desc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.6; }
+
+    @media (max-width: 600px) { .hearts-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="scroll-progress"></div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="site-logo">
+      <img src="logo.png" alt="Escape Room" class="site-logo__img">
+      <div class="site-logo__text">
+        <span class="site-logo__name">פורטל מפעיל</span>
+        <span class="site-logo__sub">ELM STREET &amp; THE BUTCHERY</span>
+      </div>
+    </a>
+    <button class="nav-toggle" aria-label="תפריט">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="19" y2="6"/>
+        <line x1="3" y1="12" x2="19" y2="12"/>
+        <line x1="3" y1="18" x2="19" y2="18"/>
+      </svg>
+    </button>
+    <nav class="site-nav">
+      <a href="index.html" class="nav-link">🏠 ראשי</a>
+      <a href="elm-street.html" class="nav-link">🔪 אלם סטריט</a>
+      <a href="hakatzia.html" class="nav-link active">🥩 הקצביה</a>
+      <a href="qa.html" class="nav-link nav-link--qa">💬 Q&A טלפוני</a>
+    </nav>
+  </div>
+</header>
+
+<div class="room-header">
+  <span class="room-header__icon">🥩</span>
+  <h1 class="room-header__title">הקצביה</h1>
+  <p class="room-header__sub">חדר בריחה | מדריך מפעיל מלא</p>
+  <div class="room-header__badges">
+    <span class="badge badge--green2">60 דקות</span>
+    <span class="badge badge--green2">עד 8 שחקנים</span>
+    <span class="badge badge--gold">קריפי-מציאותי</span>
+    <span class="badge badge--green2">3 חדרים</span>
+  </div>
+</div>
+
+<main class="container" style="padding-top: 32px; padding-bottom: 60px;">
+  <div class="tabs-wrapper">
+    <div class="page-tabs">
+      <button class="page-tab active" data-tab="equipment">🎛️ ציוד</button>
+      <button class="page-tab" data-tab="briefing">🎙️ כניסה</button>
+      <button class="page-tab" data-tab="rooms">🗺️ חדרים</button>
+      <button class="page-tab" data-tab="checklist">✅ צ'קליסט</button>
+    </div>
+
+    <!-- TAB: EQUIPMENT -->
+    <div class="tab-panel active" data-panel="equipment">
+
+      <div class="section animate-in">
+        <h2 class="section-title section-title--green"><span class="icon">🎛️</span> ציוד שליטה</h2>
+        <div class="equipment-grid animate-stagger">
+          <div class="equipment-card">
+            <span class="equipment-card__icon">🟠</span>
+            <div class="equipment-card__name">שלט כתום</div>
+            <div class="equipment-card__desc">שולט על האור בכל החדרים. 6 כפתורים — כולם עושים אותו דבר: מכבים ומדליקים את כל האורות.</div>
+          </div>
+          <div class="equipment-card">
+            <span class="equipment-card__icon">🔵</span>
+            <div class="equipment-card__name">שלט כחול (1–16)</div>
+            <div class="equipment-card__desc">כל כפתור מפעיל אלמנט ספציפי. <strong>זהו לוח הבקרה הראשי שלכם.</strong></div>
+          </div>
+          <div class="equipment-card">
+            <span class="equipment-card__icon">🟤</span>
+            <div class="equipment-card__name">שלט חום</div>
+            <div class="equipment-card__desc">כפתור אחד. שולט על פתיחת דלת הכניסה. <strong>קחו אותו איתכם</strong> לפני שיכנסו השחקנים.</div>
+          </div>
+          <div class="equipment-card">
+            <span class="equipment-card__icon">⬛</span>
+            <div class="equipment-card__name">מחולל מספרים</div>
+            <div class="equipment-card__desc">קופסה שחורה, פינה ימנית של חדר הבקרה. מספר שמוזן → מופיע על צג הלובי.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section animate-in">
+        <h2 class="section-title section-title--green"><span class="icon">📋</span> לפני כניסת השחקנים</h2>
+        <div class="steps animate-stagger">
+          <div class="step">
+            <div class="step__num" style="background:rgba(50,180,80,0.15);border-color:rgba(50,180,80,0.35);color:#4ec97e;">1</div>
+            <div class="step__content"><div class="step__title">אור כבוי</div><div class="step__desc">ודאו שהאור כבוי בכל החדרים.</div></div>
+          </div>
+          <div class="step">
+            <div class="step__num" style="background:rgba(50,180,80,0.15);border-color:rgba(50,180,80,0.35);color:#4ec97e;">2</div>
+            <div class="step__content"><div class="step__title">מוזיקה</div><div class="step__desc">הפעילו את המוזיקה.</div></div>
+          </div>
+          <div class="step">
+            <div class="step__num" style="background:rgba(50,180,80,0.15);border-color:rgba(50,180,80,0.35);color:#4ec97e;">3</div>
+            <div class="step__content"><div class="step__title">סינר + פתק</div><div class="step__desc">לבשו את הסינר. ודאו ששמתם את <strong>הפתק בכיס</strong>.</div></div>
+          </div>
+          <div class="step">
+            <div class="step__num" style="background:rgba(50,180,80,0.15);border-color:rgba(50,180,80,0.35);color:#4ec97e;">4</div>
+            <div class="step__content"><div class="step__title">מחולל מספרים</div><div class="step__desc">הכניסו <strong>666</strong> ולחצו ENT.</div></div>
+          </div>
+          <div class="step">
+            <div class="step__num" style="background:rgba(50,180,80,0.15);border-color:rgba(50,180,80,0.35);color:#4ec97e;">5</div>
+            <div class="step__content"><div class="step__title">סגירת חדר בקרה</div><div class="step__desc">סגרו את דלת הפריזר. קחו <strong>שלט חום</strong>.</div></div>
+          </div>
+          <div class="step">
+            <div class="step__num" style="background:rgba(50,180,80,0.15);border-color:rgba(50,180,80,0.35);color:#4ec97e;">6</div>
+            <div class="step__content"><div class="step__title">עמידה ליד הדלת</div><div class="step__desc">יש <strong>צוהר קטן לעיניים</strong> — מחכים לדפיקה.</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB: BRIEFING -->
+    <div class="tab-panel" data-panel="briefing">
+
+      <div class="section animate-in">
+        <div class="alert alert--gold" style="margin-bottom: 20px;">
+          <span>💰</span>
+          <div><strong>תשלום קודם כל.</strong> לסיים עם זה לפני שמכניסים לחדר.</div>
+        </div>
+
+        <h2 class="section-title section-title--green"><span class="icon">🎙️</span> נוסח לשחקנים לפני הכניסה</h2>
+        <div class="speech-box">
+          <em>"הזמנתם תור לקצביה. מספר התור שלכם הוא 666.<br>
+          כשהוא יופיע על המסך למעלה — תגשו לדלת ותדפקו עליה."</em>
+        </div>
+        <div class="alert alert--gold">
+          <span>👤</span>
+          <div>בשלב זה — <strong>היכנסו לחדר והתכוננו.</strong> בצד ימין למעלה של הדלת מבחוץ יש כפתור שפותח אותה. סגרו מאחוריכם.</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section animate-in">
+        <h2 class="section-title section-title--green"><span class="icon">🚪</span> כשהשחקנים דופקים</h2>
+        <div class="steps animate-stagger">
+          <div class="step">
+            <div class="step__num" style="background:rgba(50,180,80,0.15);border-color:rgba(50,180,80,0.35);color:#4ec97e;">1</div>
+            <div class="step__content"><div class="step__title">פתיחת הצוהר</div><div class="step__desc">פתחו <strong>בפתאומיות</strong>. מבט כועס ומפחיד. סגרו מיד.</div></div>
+          </div>
+          <div class="step">
+            <div class="step__num" style="background:rgba(50,180,80,0.15);border-color:rgba(50,180,80,0.35);color:#4ec97e;">2</div>
+            <div class="step__content"><div class="step__title">הליכה לדלפק</div><div class="step__desc">לכו לדלפק המעדניה. פתחו הדלת בעזרת <strong>השלט החום</strong>.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section animate-in">
+        <h2 class="section-title section-title--green"><span class="icon">💬</span> נוסח הדמות עם כניסת השחקנים</h2>
+        <div class="speech-box">
+          <em>"שלום! איך אני יכול לעזור לכם?<br>
+          מה תרצו? יש 30% הנחה על השייטל, רוצים?<br>
+          טוב... אני רואה שאין לי פה שייטל.<br>
+          אני אלך להביא מהפריזר.<br>
+          אתם תצטרכו להישאר פה לבד.<br>
+          שימו לב — בבקשה לא לפתוח שקיות או צנצנות,<br>
+          לא להפעיל כוח על דברים,<br>
+          ותמיד לעקוב אחרי נהלים סניטריים."</em>
+        </div>
+        <div class="steps animate-stagger" style="margin-top: 14px;">
+          <div class="step">
+            <div class="step__num" style="background:rgba(50,180,80,0.15);border-color:rgba(50,180,80,0.35);color:#4ec97e;">א</div>
+            <div class="step__content"><div class="step__title">הפלת הפתק</div><div class="step__desc"><strong>תפילו את הפתק מהכיס</strong> — בטבעיות, כאילו בטעות.</div></div>
+          </div>
+          <div class="step">
+            <div class="step__num" style="background:rgba(50,180,80,0.15);border-color:rgba(50,180,80,0.35);color:#4ec97e;">ב</div>
+            <div class="step__content"><div class="step__title">כניסה לפריזר + נעילה</div><div class="step__desc">היכנסו לפריזר ו<strong>נעלו מאחוריכם</strong>. ודאו שהשחקנים סוגרים דלת היטב.</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB: ROOMS -->
+    <div class="tab-panel" data-panel="rooms">
+
+      <!-- מעדניה -->
+      <div class="room-segment animate-in">
+        <div class="room-segment__header">
+          <div class="room-segment__num">1</div>
+          <div class="room-segment__title">🏪 המעדניה</div>
+        </div>
+        <div class="room-segment__body">
+
+          <div class="mission">
+            <div class="mission__header"><span class="mission__label">משימה 1</span><span class="mission__title">חיבור תנור לחשמל</span></div>
+            <div class="mission__body">
+              השחקנים מחברים <strong>התנור לחשמל</strong> → נשמעת מנגינה קצרה.
+              <div class="op-action" style="margin-top:10px;"><span class="op-action__icon">🎛️</span><div>הדליקו את האור בחדר.</div></div>
+            </div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header"><span class="mission__label">משימה 2</span><span class="mission__title">מפת הנתחים → קוד התנור</span></div>
+            <div class="mission__body">
+              <strong>הנהלים הסניטריים</strong> מפנים למפת הנתחים על הקיר → קוד לפתיחת <strong>דלת התנור</strong>.<br><br>
+              בתנור: <strong>שקיות בשר + שטר דולר</strong>. השטר מנחה לגשת לקופה.
+            </div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header"><span class="mission__label">משימה 3</span><span class="mission__title">הקופה → רשימת תבלינים</span></div>
+            <div class="mission__body">
+              "במקרה של תקלה יש לפתוח את הקופה ידנית" — <strong>פתיחה ידנית בצד האחורי</strong>.<br><br>
+              בפנים: <strong>רשימת תבלינים</strong>. צנצנות מאחוריהם → בפנים מספרים.
+            </div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header"><span class="mission__label">משימה 4</span><span class="mission__title">חיוג בטלפון → שקילת בשר</span></div>
+            <div class="mission__body">
+              מקישים מספרים לפי הסדר ב<strong>טלפון על הדלפק</strong> → שומעים <strong>הקלטה</strong> שמנחה לשקול חבילות בשר.
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- חדר לבבות -->
+      <div class="room-segment animate-in">
+        <div class="room-segment__header">
+          <div class="room-segment__num">2</div>
+          <div class="room-segment__title">❤️ חדר הלבבות</div>
+        </div>
+        <div class="room-segment__body">
+
+          <div class="alert alert--red" style="margin-bottom:14px;">
+            <span>🎭</span>
+            <div><strong>הפחדת השייטל:</strong> בזמן השקילה — קחו שקית מחדר הבקרה, פתחו הדלת בפתאומיות: <em>"הנה השייטל שביקשתם!"</em> — חזרו מיד ונעלו.</div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header"><span class="mission__label">מטרה</span><span class="mission__title">למצוא שלושה לבבות</span></div>
+            <div class="mission__body">
+              <div class="hearts-grid">
+                <div class="heart-card">
+                  <span class="heart-card__icon">❤️</span>
+                  <div class="heart-card__num">לב 1</div>
+                  <div class="heart-card__desc">על <strong>מטחנת הבשר</strong> על השולחן.</div>
+                </div>
+                <div class="heart-card">
+                  <span class="heart-card__icon">❤️</span>
+                  <div class="heart-card__num">לב 2</div>
+                  <div class="heart-card__desc">במגירה. לפתוח: 3 כפתורים בו-זמנית — 2 ליד ארון חשמל, 1 בצד השולחן.</div>
+                </div>
+                <div class="heart-card">
+                  <span class="heart-card__icon">❤️</span>
+                  <div class="heart-card__num">לב 3</div>
+                  <div class="heart-card__desc">להוציא פקק מכיור → רמז → משוך ראשים תלויים בסדר → לב ייפול מהצלעות.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header"><span class="mission__label">חידה</span><span class="mission__title">חידת המקרר (מתקדמים)</span></div>
+            <div class="mission__body">
+              <div class="sub-steps">
+                <div class="sub-step"><div class="sub-step__dot"></div><div>סינר עם תמונה → תקוע סכין בשקע חשמל → פותח ארון חשמל.</div></div>
+                <div class="sub-step"><div class="sub-step__dot"></div><div>שלט "מחסן" ליד הארון → למשוך למטה ולהסתכל בעינית.</div></div>
+                <div class="sub-step"><div class="sub-step__dot"></div><div>שחקן אחד מכניס יד לארון; השני מדריך בעינית.</div></div>
+                <div class="sub-step"><div class="sub-step__dot"></div><div>סדר המתגים → <strong>חתיכת בשר רקוב בפח</strong>.</div></div>
+                <div class="sub-step"><div class="sub-step__dot"></div><div>לכבות אור → <strong>UV (קוטל יתושים)</strong> מדליק → חושף חיצים על האריזה = סדר המתגים.</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header"><span class="mission__label">מעבר</span><span class="mission__title">שקיות למקרר → פתיחת חדר הבא</span></div>
+            <div class="mission__body">
+              השחקנים שמים שקיות בויטרינה.
+              <div class="op-action" style="margin-top:10px;"><span class="op-action__icon">🎛️</span><div>מצאו רגע הגיוני → לחצו <strong>"דלת מזווה"</strong>. מוזיקה נעצרת, דלת לחדר הבא נפתחת.</div></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- כלוב -->
+      <div class="room-segment animate-in">
+        <div class="room-segment__header">
+          <div class="room-segment__num">2b</div>
+          <div class="room-segment__title">🔒 פתיחת המקרר — הכלוב</div>
+        </div>
+        <div class="room-segment__body">
+
+          <div class="op-action">
+            <span class="op-action__icon">🎛️</span>
+            <div>דלת המקרר נפתחת → פתחו כלוב בשלט כחול → הקרינו סרטון: לחצו מתג <strong>1</strong>.</div>
+          </div>
+
+          <div class="speech-box">
+            <em>"איציק, תן לי את הקורבן הכי טוב שלך."</em>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header"><span class="mission__label">פעולה</span><span class="mission__title">קשירת הקורבן + סיבוב 180°</span></div>
+            <div class="mission__body">
+              השחקנים קושרים אחד מהקבוצה לרתמות בכלוב. לאחר שקשור:
+              <div class="sub-steps" style="margin-top:10px;">
+                <div class="sub-step"><div class="sub-step__dot"></div><div>סגרו דלת הכלוב. הדריכו בכריזה אם נדרש.</div></div>
+                <div class="sub-step"><div class="sub-step__dot"></div><div>העבירו וידאו ל-<strong>LED 2</strong>. לחצו מתג <strong>2</strong>.</div></div>
+                <div class="sub-step"><div class="sub-step__dot"></div><div>אחרי 7–8 שניות: <strong>לחיצה ארוכה על המתג האדום</strong> → סיבוב 180°. החזיקו עד סוף הסיבוב.</div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- פרדריק -->
+      <div class="room-segment animate-in">
+        <div class="room-segment__header">
+          <div class="room-segment__num">3</div>
+          <div class="room-segment__title">🧟 פרדריק — חדר הגופה</div>
+        </div>
+        <div class="room-segment__body">
+
+          <div class="alert alert--gold" style="margin-bottom:14px;">
+            <span>ℹ️</span>
+            <div>הקורבן נכנס לחדר 3. <strong>שאר השחקנים בחדר 2</strong> — רואים גופה עם צינורות וצריכים לחבר לפי מדריך. כשנכון → הודעה: <em>"תקלה במקרר"</em>. בפריזר רמז: ידית הברז לפתיחת הצד האחורי של המקרר → מעבר לחדר הקורבן.</div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header"><span class="mission__label">שלב א</span><span class="mission__title">שחרור הקורבן</span></div>
+            <div class="mission__body">
+              <strong>מנואלה</strong> על הצידנית → חיבור וסיבוב → אור בבטן הבובה → קוד שחרור מהכלוב.
+              <div class="mission__tip">💡 להזכיר לשחקנים להוסיף <strong>סולמית (#)</strong> אם צריך.</div>
+            </div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header"><span class="mission__label">שלב ב</span><span class="mission__title">הצידנית → עכבר → עין → מוט</span></div>
+            <div class="mission__body">
+              צידנית בכלוב → מתחת לשאר → נפתחת: <strong>איבר ראשון + גבינה</strong>.<br>
+              גבינה → מלכודת עכברים → עין. עין → ראש האישה → יד קופצת → <strong>מוט עם קרס</strong>.
+            </div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header"><span class="mission__label">שלב ג</span><span class="mission__title">הירך + ג'ינס + כרטיס עובד</span></div>
+            <div class="mission__body">
+              מוט + מוט ארוך → משיכת תיבה על מסילה → <strong>ירך</strong> נופלת. לשים ירך במקום:
+              <div class="op-action" style="margin-top:10px;"><span class="op-action__icon">🎛️</span><div><strong>כפתור 14</strong> בשלט כחול → ג'ינס נופל → מכיסו: ארנק + <strong>כרטיס עובד</strong> → מכונת ההחתמות → דלת האחרון נפתחת.</div></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- הפחדה + חדר מיקרו -->
+      <div class="room-segment animate-in">
+        <div class="room-segment__header">
+          <div class="room-segment__num">3b</div>
+          <div class="room-segment__title">🪚 הפחדה + חדר מיקרו</div>
+        </div>
+        <div class="room-segment__body">
+
+          <div class="mission">
+            <div class="mission__header"><span class="mission__label">הפחדה</span><span class="mission__title">כניסה עם מסור</span></div>
+            <div class="mission__body">
+              <div class="sub-steps">
+                <div class="sub-step"><div class="sub-step__dot"></div><div>לבשו <strong>סינר + מסכת חזיר</strong>. קחו שלט כתום ו<strong>מסור חשמלי</strong> מחדר 2.</div></div>
+                <div class="sub-step"><div class="sub-step__dot"></div><div>דלת מסתובבת: כפתור בצד ימין למעלה. <strong>⚠️ זהירות על האצבעות.</strong></div></div>
+                <div class="sub-step"><div class="sub-step__dot"></div><div>בצד הצר של הדלת: <strong>מתג לבן</strong> → פלאשים + קולות מסור.</div></div>
+                <div class="sub-step"><div class="sub-step__dot"></div><div>בסיום: כבו מתג, סגרו דלת.</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header"><span class="mission__label">חדר מיקרו</span><span class="mission__title">שני האיברים האחרונים</span></div>
+            <div class="mission__body">
+              <strong>זרוע:</strong> מאחורי וילון — שתי רגליים. להלביש כפכף על הרגל → היד תיפול מהתקרה.<br><br>
+              <strong>ראש:</strong> מיקרוגל + ראש עם שיניים + פלייר. לעקור 3 שיניים → בכל שן: צבע. ללחוץ 3 כפתורים בצבעים בו-זמנית → מיקרוגל נפתח → <strong>ראש, האיבר האחרון</strong>.
+            </div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header"><span class="mission__label">סיום</span><span class="mission__title">כל האיברים → המשחק נגמר</span></div>
+            <div class="mission__body">
+              כל האיברים מחוברים לגופה.
+              <div class="op-action" style="margin-top:10px;"><span class="op-action__icon">🏁</span><div>לחצו <strong>"סוף משחק"</strong>.</div></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB: CHECKLIST -->
+    <div class="tab-panel" data-panel="checklist">
+
+      <div class="alert alert--red" style="margin-bottom:20px;" id="checklist">
+        <span>⚠️</span>
+        <div>לסמן כל פריט לפני כל קבוצה. הצ'קליסט נשמר אוטומטית בדפדפן.</div>
+      </div>
+
+      <div class="section animate-in">
+        <h2 class="section-title section-title--green" style="margin-bottom:16px;">🏪 מעדניה</h2>
+        <div class="checklist animate-stagger">
+          <div class="check-item" data-key="kat_m1"><span class="check-box"></span>שקיות בשר ושטר בתנור</div>
+          <div class="check-item" data-key="kat_m2"><span class="check-box"></span>התנור מנותק מהחשמל</div>
+          <div class="check-item" data-key="kat_m3"><span class="check-box"></span>שייטל בחדר הבקרה</div>
+          <div class="check-item" data-key="kat_m4"><span class="check-box"></span>פתק תבלינים בקופה</div>
+          <div class="check-item" data-key="kat_m5"><span class="check-box"></span>תבלינים מסודרים במזווה</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section animate-in">
+        <h2 class="section-title section-title--green" style="margin-bottom:16px;">❤️ חדר לבבות</h2>
+        <div class="checklist animate-stagger">
+          <div class="check-item" data-key="kat_l1"><span class="check-box"></span>לב במגירה</div>
+          <div class="check-item" data-key="kat_l2"><span class="check-box"></span>לב על המטחנה</div>
+          <div class="check-item" data-key="kat_l3"><span class="check-box"></span>לב בתוך הצלעות</div>
+          <div class="check-item" data-key="kat_l4"><span class="check-box"></span>למלא כיור במים עם צבע מאכל</div>
+          <div class="check-item" data-key="kat_l5"><span class="check-box"></span>לנתק צינורות מהגופה</div>
+          <div class="check-item" data-key="kat_l6"><span class="check-box"></span>לסגור את המקרר</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section animate-in">
+        <h2 class="section-title section-title--green" style="margin-bottom:16px;">🧟 חדר אחרון</h2>
+        <div class="checklist animate-stagger">
+          <div class="check-item" data-key="kat_a1"><span class="check-box"></span>ירך בתוך צידנית</div>
+          <div class="check-item" data-key="kat_a2"><span class="check-box"></span>גבינה בצידנית בכלוב</div>
+          <div class="check-item" data-key="kat_a3"><span class="check-box"></span>מנואלה על הקולר האמצעי</div>
+          <div class="check-item" data-key="kat_a4"><span class="check-box"></span>כרטיס עובד בארנק בכיס הג'ינס</div>
+          <div class="check-item" data-key="kat_a5"><span class="check-box"></span>לחבר ג'ינס למגנט עם סולם</div>
+          <div class="check-item" data-key="kat_a6"><span class="check-box"></span>להחזיר רגל לתא הנגרר</div>
+          <div class="check-item" data-key="kat_a7"><span class="check-box"></span>לשים עין על העכבר</div>
+          <div class="check-item" data-key="kat_a8"><span class="check-box"></span>לנתק שני חלקי המוט</div>
+          <div class="check-item" data-key="kat_a9"><span class="check-box"></span>להחזיר ראש למיקרוגל</div>
+          <div class="check-item" data-key="kat_a10"><span class="check-box"></span>להכניס זרוע לתקרה</div>
+          <div class="check-item" data-key="kat_a11"><span class="check-box"></span>לשים כפכף ליד הרגל</div>
+          <div class="check-item" data-key="kat_a12"><span class="check-box"></span>לסגור וילון</div>
+          <div class="check-item" data-key="kat_a13"><span class="check-box"></span>להחזיר שיניים לראש</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 24px; text-align: center;">
+        <button class="checklist-reset" style="background:var(--bg-card);border:1px solid var(--border-dark);color:var(--text-muted);padding:10px 20px;border-radius:var(--radius-md);cursor:pointer;font-family:var(--font-body);font-size:0.82rem;transition:var(--transition);">
+          🔄 איפוס צ'קליסט
+        </button>
+      </div>
+
+    </div>
+  </div><!-- end tabs-wrapper -->
+</main>
+
+<footer style="text-align:center;padding:24px;color:var(--text-muted);font-size:0.78rem;border-top:1px solid var(--border-dark);position:relative;z-index:1;">
+  פורטל מפעיל פנימי — לשימוש צוות בלבד
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

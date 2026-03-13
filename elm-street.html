@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>אלם סטריט | מדריך מפעיל</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .room-header {
+      background: linear-gradient(180deg, rgba(90,15,10,0.4) 0%, transparent 100%);
+      padding: 48px 20px 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .room-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(192,57,43,0.15), transparent);
+    }
+    .room-header__icon {
+      font-size: 4rem;
+      display: block;
+      margin-bottom: 12px;
+      animation: flicker 6s infinite 2s;
+    }
+    .room-header__title {
+      font-size: clamp(2rem, 7vw, 3.5rem);
+      font-weight: 900;
+      color: var(--red-vivid);
+      text-shadow: 0 0 40px var(--red-glow);
+      margin-bottom: 8px;
+    }
+    .room-header__sub {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    .room-header__badges {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 14px;
+    }
+
+    /* Story box */
+    .story-box {
+      background: linear-gradient(135deg, rgba(192,57,43,0.08), rgba(10,10,15,0.9));
+      border: 1px solid var(--border-red);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .story-box::before {
+      content: '"';
+      position: absolute;
+      top: -10px;
+      right: 20px;
+      font-size: 8rem;
+      color: rgba(192,57,43,0.1);
+      font-family: Georgia, serif;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .story-box p {
+      font-size: 0.93rem;
+      line-height: 1.85;
+      color: var(--text-secondary);
+    }
+    .story-box p + p { margin-top: 12px; }
+    .story-box .highlight {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Room flow timeline */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      right: 19px;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--red-dark), transparent);
+    }
+    .timeline-item {
+      display: flex;
+      gap: 20px;
+      padding-bottom: 28px;
+      position: relative;
+    }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .timeline-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      border: 2px solid var(--red-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+    .timeline-content { flex: 1; padding-top: 8px; }
+    .timeline-title {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: var(--text-primary);
+    }
+
+    /* Room segments */
+    .room-segment {
+      background: var(--bg-card);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .room-segment__header {
+      background: linear-gradient(135deg, rgba(192,57,43,0.15), transparent);
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid var(--border-dark);
+    }
+    .room-segment__num {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--red-dark);
+      border: 2px solid var(--border-red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .room-segment__title { font-size: 1.1rem; font-weight: 800; }
+    .room-segment__timing {
+      margin-right: auto;
+      font-size: 0.78rem;
+      color: var(--gold);
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.2);
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-left: 0;
+    }
+    .room-segment__body { padding: 20px 22px; }
+
+    /* Mission within a room */
+    .mission {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      margin-bottom: 12px;
+      transition: var(--transition);
+    }
+    .mission:hover { border-color: var(--border-red); }
+    .mission__header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .mission__label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--red-vivid);
+    }
+    .mission__title { font-size: 0.95rem; font-weight: 700; }
+    .mission__body {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    .mission__body strong { color: var(--text-primary); }
+    .mission__code {
+      display: inline-block;
+      background: var(--red-dark);
+      color: #fff;
+      font-family: monospace;
+      font-size: 1.2rem;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 6px;
+      margin: 8px 0;
+      letter-spacing: 0.25em;
+      border: 1px solid var(--border-red);
+    }
+    .mission__tip {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: rgba(201,168,76,0.06);
+      border-right: 3px solid var(--gold);
+      border-radius: 0 4px 4px 0;
+      font-size: 0.82rem;
+      color: var(--gold);
+    }
+    .mission__alert {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: rgba(192,57,43,0.08);
+      border-right: 3px solid var(--red-vivid);
+      border-radius: 0 4px 4px 0;
+      font-size: 0.82rem;
+      color: #e08070;
+    }
+
+    /* Operator action box */
+    .op-action {
+      background: rgba(192,57,43,0.07);
+      border: 1px solid var(--border-red);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      font-size: 0.85rem;
+      color: #d07060;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-top: 12px;
+    }
+    .op-action__icon { font-size: 1.1rem; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+<div class="scroll-progress"></div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="site-logo">
+      <img src="logo.png" alt="Escape Room" class="site-logo__img">
+      <div class="site-logo__text">
+        <span class="site-logo__name">פורטל מפעיל</span>
+        <span class="site-logo__sub">ELM STREET &amp; THE BUTCHERY</span>
+      </div>
+    </a>
+    <button class="nav-toggle" aria-label="תפריט">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="19" y2="6"/>
+        <line x1="3" y1="12" x2="19" y2="12"/>
+        <line x1="3" y1="18" x2="19" y2="18"/>
+      </svg>
+    </button>
+    <nav class="site-nav">
+      <a href="index.html" class="nav-link">🏠 ראשי</a>
+      <a href="elm-street.html" class="nav-link active">🔪 אלם סטריט</a>
+      <a href="hakatzia.html" class="nav-link">🥩 הקצביה</a>
+      <a href="qa.html" class="nav-link nav-link--qa">💬 Q&A טלפוני</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ROOM HEADER -->
+<div class="room-header">
+  <span class="room-header__icon">🔪</span>
+  <h1 class="room-header__title">אלם סטריט</h1>
+  <p class="room-header__sub">חדר בריחה | מדריך מפעיל מלא</p>
+  <div class="room-header__badges">
+    <span class="badge badge--red">60 דקות</span>
+    <span class="badge badge--red">עד 10 שחקנים</span>
+    <span class="badge badge--green">4 חדרים</span>
+    <span class="badge badge--gold">שחקן חי</span>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="container" style="padding-top: 32px; padding-bottom: 60px;">
+
+  <!-- TABS -->
+  <div class="tabs-wrapper">
+    <div class="page-tabs">
+      <button class="page-tab active" data-tab="briefing">🎙️ תדריך</button>
+      <button class="page-tab" data-tab="rooms">🗺️ חדרים</button>
+      <button class="page-tab" data-tab="rules">📋 חוקים</button>
+      <button class="page-tab" data-tab="checklist">✅ צ'קליסט</button>
+    </div>
+
+    <!-- TAB: BRIEFING -->
+    <div class="tab-panel active" data-panel="briefing">
+      <div class="section animate-in">
+        <div class="alert alert--gold" style="margin-bottom: 20px;">
+          <span>💰</span>
+          <div><strong>חשוב ראשון:</strong> לבצע תשלום לפני הכל. אנחנו לא רוצים שהדבר האחרון שהם סוגרים הוא חוויית התשלום.</div>
+        </div>
+      </div>
+
+      <div class="section animate-in" id="briefing">
+        <h2 class="section-title"><span class="icon">🎙️</span> נוסח התדריך</h2>
+
+        <div class="story-box" style="margin-bottom: 20px;">
+          <p>שאלו: <span class="highlight">"הייתם פעם בחדר בריחה?"</span></p>
+          <p>שאלו: <span class="highlight">"מכירים את הסרט סיוט ברחוב אלם?"</span></p>
+        </div>
+
+        <div class="story-box">
+          <p><span class="highlight">ברוכים הבאים.</span></p>
+          <p>לפני שאתם נכנסים פנימה, חשוב שתדעו דבר אחד — יש מקומות שלא באמת עוזבים אותך. ויש אנשים... שחוזרים דווקא כשאתם עוצמים עיניים.</p>
+          <p>אלם סטריט הוא רחוב רגיל למראה, בעיירה אמריקאית שקטה. בתים יפים, מדשאות מסודרות, שכנים שמחייכים. אבל מתחת לפני השטח מסתתר סוד אפל.</p>
+          <p>פרדי קרוגר היה אדם שרצח ילדים מהשכונה. לאחר שנתפס — הוא שוחרר בגלל טעות טכנית. ההורים הזועמים לקחו את החוק לידיים, לכדו אותו ושרפו אותו חי.</p>
+          <p><span class="highlight">הם חשבו שזה נגמר שם.</span></p>
+          <p>אבל פרדי חזר. לא כבשר ודם — אלא כסיוט. הוא רודף את ילדיהם בתוך החלומות שלהם. ואם הוא פוגע בכם בחלום... אתם לא מתעוררים.</p>
+          <p><span class="highlight">המשחק שלכם מתחיל בדיוק במקום שבו המציאות והחלום מתחילים להתערבב.</span></p>
+        </div>
+      </div>
+
+      <div class="section animate-in">
+        <h2 class="section-title"><span class="icon">🚶</span> כניסה לחדר</h2>
+        <div class="steps animate-stagger">
+          <div class="step">
+            <div class="step__num">1</div>
+            <div class="step__content">
+              <div class="step__title">עמידה בטור</div>
+              <div class="step__desc">המשתתפים עומדים בטור במסדרון לפני הכניסה. סוגרים את שרשרת "אין מעבר".</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num">2</div>
+            <div class="step__content">
+              <div class="step__title">הצגת פרדי</div>
+              <div class="step__desc">"אם תסתכלו ימינה ושמאלה תוכלו לראות את פרדי קרוגר. פניו שרופות, הוא חובש כובע ולובש כפפות שמכל אצבע יוצא סכין."</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num">3</div>
+            <div class="step__content">
+              <div class="step__title">עיניים עצומות</div>
+              <div class="step__desc">"מאחר ואנחנו נכנסים לתוך חלום, אנחנו נכניס כל אחד בתורו לחדר. חשוב לשמור על עיניים עצומות. אנחנו נוביל אתכם."</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num">4</div>
+            <div class="step__content">
+              <div class="step__title">כניסה לתא הטלפון</div>
+              <div class="step__desc">מכניסים משתתף אחד אחד. את <strong>המשתתף האחרון</strong> מכניסים לתוך <strong>תא הטלפון</strong> וסוגרים את הדלת.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num">5</div>
+            <div class="step__content">
+              <div class="step__title">הפעלת הקלטה</div>
+              <div class="step__desc">"כעת תשמעו הקלטה. ברגע שההקלטה תיגמר תפקחו את העיניים." — לצאת מהחדר, לסגור דלת. ליד הדלת יש <strong>כפתור כסוף</strong> — לחצו עד ששומעים ההקלטה מתחילה.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num">6</div>
+            <div class="step__content">
+              <div class="step__title">תחילת המשחק</div>
+              <div class="step__desc">כשההקלטה נגמרת — הדליקו אור בעזרת <strong>הכפתור הלבן</strong>. אמרו בקשר: <strong>"בהצלחה"</strong>. המשחק מתחיל!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ROOMS -->
+    <div class="tab-panel" data-panel="rooms">
+
+      <!-- ROOM 1 -->
+      <div class="room-segment animate-in">
+        <div class="room-segment__header">
+          <div class="room-segment__num">1</div>
+          <div class="room-segment__title">🏡 חדר 1 — החצר</div>
+          <div class="room-segment__timing">⏱️ עד 20 דקות</div>
+        </div>
+        <div class="room-segment__body">
+
+          <div class="mission">
+            <div class="mission__header">
+              <span class="mission__label">משימה 1</span>
+              <span class="mission__title">הוצאת השחקן מתא הטלפון</span>
+            </div>
+            <div class="mission__body">
+              בתא הטלפון יש כפתור שמדליק אור וחושף מספרים על משחק קלאס לפי צבעים. יש תמונה נוספת בפתח הניקוז מחוץ לתא הטלפון.
+              <br><br>
+              השחקנים צריכים לדרוך על המספרים במשחק הקלאס לפי הסדר הנכון. הסדר מופיע על <strong>חתיכת בד שנמצאת בפח האשפה</strong>. הקוד:
+              <br>
+              <div class="mission__code">1 → 4 → 6 → 2</div>
+              <div class="mission__tip">⚠️ אם הם דורכים נכון אך לא במרכז הריבוע — פתחו את דלת הטלפון ידנית עם כפתור "טלפון".</div>
+            </div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header">
+              <span class="mission__label">משימה 2</span>
+              <span class="mission__title">תיבת הדואר + השלט</span>
+            </div>
+            <div class="mission__body">
+              בתא הטלפון יש <strong>מפתח</strong> שמתאים לתיבת הדואר. בתוך התיבה יש מכתב. בצידו האחורי תמונה של החצר — ילד מחפש מאחורי תא הטלפון.
+              <br><br>
+              שם ימצאו <strong>לבנה עם מספר טלפון</strong>. כשמכניסים את המספר בטלפון — יפתח השלט <strong>For Rent</strong>, שיפיל מתג אדום.
+            </div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header">
+              <span class="mission__label">משימה 3</span>
+              <span class="mission__title">הקבר + מספר הבית</span>
+            </div>
+            <div class="mission__body">
+              המתג האדום מתחבר לקופסת הפיוזים בחצר → פותח את הקבר. מתחת לקבר:
+              <ul style="margin: 10px 0 10px 20px; color: var(--text-secondary);">
+                <li>מכתב</li>
+                <li>קופסת כדורי שינה</li>
+                <li>הספרה 4 ממתכת</li>
+              </ul>
+              <strong>חשוב:</strong> להדריך לקרוא את המכתב לפני שמחברים את המספר. המספר מתאים לשלט מספר הבית. חיבורו → יגבה האור, יפעיל מוזיקה, ויפתח דלת לחדר הבא.
+              <div class="mission__alert">💬 להזכיר לשחקנים להשאיר כל החפצים, להתקדם ולסגור דלת מאחוריהם.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROOM 2 -->
+      <div class="room-segment animate-in">
+        <div class="room-segment__header">
+          <div class="room-segment__num">2</div>
+          <div class="room-segment__title">🛏️ חדר 2 — חדר השינה</div>
+          <div class="room-segment__timing">⏱️ עד 30 דקות</div>
+        </div>
+        <div class="room-segment__body">
+
+          <div class="op-action">
+            <span class="op-action__icon">🖥️</span>
+            <div>סביר שישכנסו לאט כי חשוך. אם צריך — הזכירו לסגור דלת. בשלב זה אפשר ללחוץ כפתור <strong>"מנוע"</strong> להפחדה. כשמוזיקה נגמרת — הדליקו אור עם <strong>הדימר</strong> (לא הלבן).</div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header">
+              <span class="mission__label">משימה 1</span>
+              <span class="mission__title">תיבת הצעצועים</span>
+            </div>
+            <div class="mission__body">
+              ליד המיטה יש <strong>ידית</strong> לפתיחת תיבת הצעצועים. כשפותחים ומסתכלים פנימה — לחצו <strong>"ידיים"</strong> לקפיצת ידיים ולהבהלה.
+              <br><br>
+              בתוך התיבה: פתק עם <em>"לך לישון ____"</em> — ידריך שחקן אחד להישכב במיטה. כשהוא שוכב — לחצו <strong>"בובה + אפקט"</strong> להפחדה.
+            </div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header">
+              <span class="mission__label">משימה 2</span>
+              <span class="mission__title">הפוסטר + ערוץ חדשות</span>
+            </div>
+            <div class="mission__body">
+              מעל קופסת הצעצועים יש <strong>מפתח בתוך הפוסטר</strong> על הקיר. פותח מגירה ליד המיטה — שם 3 דפים עם מדריך ערוצים.
+              <br><br>
+              השחקנים צריכים להפעיל <strong>ערוץ חדשות בטלוויזיה</strong> → יקפיץ ראש פרדי מעל הטלוויזיה → <strong>להלביש לפרדי את הכובע שלו</strong> → יפתח <strong>קופסת בלרינה</strong> → בדולח ראשון.
+            </div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header">
+              <span class="mission__label">משימה 3</span>
+              <span class="mission__title">קרש הקיר + שלושת הבדולחים</span>
+            </div>
+            <div class="mission__body">
+              על הקיר שמול דלת הכניסה יש <strong>קרש עץ שניתן להזיז</strong> → בובה עם בדולח שני.
+              <br><br>
+              השחקנים מניחים את 3 כדורי הבדולח על המדף. לחצו <strong>"ביטול מדף"</strong> → משנה מוזיקה, פותח דלת לחדר 3, מעמעם אורות. אפשר גם "מנוע".
+              <div class="mission__alert">🎭 הבובה תפיל לב. על השחקנים לחבר את הלב לדובי. <strong>לצאת מחדר הבקרה אל המסדרון</strong> — פתחו צוהר קטן ותנו לשחקן לקחת בדולח אחרון. סגרו מיד.</div>
+              <div class="mission__tip">🔪 הפחדה קטנה: לבשו כפפת פרדי, פתחו מעט דלת, הכניסו יד וגרדו ברעש. סגרו ונעלו מיד. הקפידו שלא יראו אתכם.</div>
+            </div>
+          </div>
+
+          <div class="op-action">
+            <span class="op-action__icon">⚙️</span>
+            <div>כפתור "צינורות": אם <strong>למעלה</strong> — המגנט לחדר האחרון לא פועל. אם <strong>למטה</strong> — הדלת סגורה כי המגנט פועל.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROOM 3 -->
+      <div class="room-segment animate-in">
+        <div class="room-segment__header">
+          <div class="room-segment__num">3</div>
+          <div class="room-segment__title">🔧 חדר 3 — חדר הצינורות</div>
+          <div class="room-segment__timing">⏱️ עד 45 דקות</div>
+        </div>
+        <div class="room-segment__body">
+
+          <div class="alert alert--gold" style="margin-bottom: 16px;">
+            <span>ℹ️</span>
+            <div>בחדר הזה <strong>אין צורך לסגור דלת</strong> מאחוריהם — זה חשוב לאחר כך. חידה אחת, אבל מורכבת. לרוב תצטרכו לתת רמזים.</div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header">
+              <span class="mission__label">חידה</span>
+              <span class="mission__title">חידת הצינורות — מעגלים ושסתומים</span>
+            </div>
+            <div class="mission__body">
+              בקצה המסדרון: סדרה של אותיות, לוח וגיר, וסדרה של <strong>סמלים משונים</strong>.
+              <br><br>
+              לאורך המסדרון: <strong>מעגלים</strong> — חצי מאותיות, חצי ממספרים. במרכז כל מעגל: שסתום עגול עם <strong>פס לבן</strong>. כל מעגל מסומן באחד הסמלים מהקצה.
+              <br><br>
+              לכל מעגל יש גם <strong>שעון מים</strong> על אותו קיר עם ספרה אחת. השחקנים צריכים:
+              <ol style="margin: 10px 0 10px 20px; color: var(--text-secondary); line-height: 2;">
+                <li>לברר מה הספרה בשעון המים</li>
+                <li>לכוון הקו הלבן על השסתום לספרה הזו</li>
+                <li>להסתכל לאן הקו מצביע בצד השני — זו האות</li>
+                <li>לסדר האותיות לפי הסמלים בקצה המסדרון</li>
+              </ol>
+              <strong>הפתרון:</strong>
+              <div class="mission__code">C A B O J</div>
+              <div class="mission__alert">🎭 בשלב מסוים במוזיקה — נשמע קול פרדי. <strong>זה הסימן להתחפש וללכת להפחיד את השחקנים.</strong> היכנסו, הפחידו, וצאו.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROOM 4 -->
+      <div class="room-segment animate-in">
+        <div class="room-segment__header">
+          <div class="room-segment__num">4</div>
+          <div class="room-segment__title">🔥 חדר 4 — המשרפה</div>
+          <div class="room-segment__timing">⏱️ סיום ~60 דקות</div>
+        </div>
+        <div class="room-segment__body">
+
+          <div class="alert alert--red" style="margin-bottom: 16px;">
+            <span>🏁</span>
+            <div>השחקנים יזחלו לחדר האחרון. כשישלימו את המשימות — המשחק מסתיים!</div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header">
+              <span class="mission__label">משימה 1</span>
+              <span class="mission__title">תינוק בכד → מפתח מהתקרה</span>
+            </div>
+            <div class="mission__body">
+              בתוך כד המתכת יש <strong>בובת תינוק עם חבל מסביב לצוואר</strong>. לתלות על וו שנמצא על הקיר → יפיל מפתח מהתקרה.
+              <div class="mission__tip">⚙️ אם המפתח לא נופל אוטומטית — לחצו כפתור "תינוק מפתח".</div>
+            </div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header">
+              <span class="mission__label">משימה 2</span>
+              <span class="mission__title">מנעול הבובה → צופן התנור</span>
+            </div>
+            <div class="mission__body">
+              המפתח מיועד למנעול ליד <strong>הרגל הימנית של הבובה הגדולה</strong>. לפתוח מנעול ולהרים בובה → מתחתיה <strong>קרש עץ עם צופן</strong>.
+            </div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header">
+              <span class="mission__label">משימה 3</span>
+              <span class="mission__title">מתגי התנור → דלת התנור</span>
+            </div>
+            <div class="mission__body">
+              הצופן מיועד למתגי התנור. כשמסדרים מתגים לפי הצופן → נפתחת <strong>דלת התנור</strong>.
+            </div>
+          </div>
+
+          <div class="mission">
+            <div class="mission__header">
+              <span class="mission__label">משימה 4</span>
+              <span class="mission__title">כיסא גלגלים + כלוב הכפפה</span>
+            </div>
+            <div class="mission__body">
+              בחדר יש <strong>כיסא גלגלים</strong>. במשענת היד יש כף יד ורמז להכניס לתוך מלחציים. כשעושים זאת — להפעיל מתג <strong>"כיסא"</strong> → כיסא יתגלגל לכיוונם.
+              <br><br>
+              <strong>מאחורי משענת הכיסא:</strong> מוט מתכת דק. להשתמש בו לפתיחת <strong>הכלוב</strong> שבו כפפת פרדי.
+              <br><br>
+              ברגע שמכניסים <strong>כפפת פרדי לתנור</strong> — המשחק נגמר! תישמע הקלטת סוף, תיפתח דלת יציאה.
+              <div class="mission__tip">🎉 ללחוץ <strong>"אור מסדרון"</strong> ולקבל את פניהם בכפיים סוערות!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: RULES -->
+    <div class="tab-panel" data-panel="rules">
+      <div class="section animate-in">
+        <h2 class="section-title"><span class="icon">📋</span> חוקי החדר — לקרוא לשחקנים</h2>
+        <div class="rules animate-stagger">
+          <div class="rule">
+            <span class="rule__icon">🔎</span>
+            <div>בחדר תמצאו חפצים שישמשו אתכם לפתרון חידות. <strong>לכל חפץ יש שימוש אחד בלבד</strong> — חפץ לא ישמש לכמה חידות.</div>
+          </div>
+          <div class="rule">
+            <span class="rule__icon">🚫</span>
+            <div>בחדרים יש גם תפאורה. תפאורה מסומנת ביד אדומה ובכיתוב <strong>"Don't touch me"</strong>. דברים שתלויים מהתקרה או מחוברים הרמטית לרצפה — גם הם תפאורה. <strong>אסור לגעת.</strong></div>
+          </div>
+          <div class="rule">
+            <span class="rule__icon">⚡</span>
+            <div>זה חדר <strong>חכם ואוטומטי</strong>. אין להפעיל כוח. שום דבר לא דורש כוח פיזי. אם משהו לא נפתח — כנראה שעוד לא פתרתם.</div>
+          </div>
+          <div class="rule">
+            <span class="rule__icon">👤</span>
+            <div>בחדר הזה יש <strong>שחקן חי</strong>. אסור בשום אופן <strong>לגעת בשחקן</strong> — ולשחקן אסור לגעת בכם.</div>
+          </div>
+          <div class="rule">
+            <span class="rule__icon">📹</span>
+            <div>החדרים <strong>מרושתים במצלמות</strong>. אם נתקלתם בבעיה — אנחנו יכולים לשמוע ולעזור.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: CHECKLIST -->
+    <div class="tab-panel" data-panel="checklist">
+      <div id="checklist">
+        <div class="alert alert--red" style="margin-bottom: 20px;">
+          <span>⚠️</span>
+          <div>לסמן כל פריט לפני כל קבוצה. הצ'קליסט נשמר אוטומטית בדפדפן.</div>
+        </div>
+
+        <div class="section animate-in">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+            <h2 class="section-title" style="margin-bottom: 0; border: none; padding: 0;">🏡 חדר 1 — החצר</h2>
+          </div>
+          <div class="checklist animate-stagger">
+            <div class="check-item" data-key="elm_c1_1"><span class="check-box"></span>מפתחות לתיבת דואר בתא טלפון</div>
+            <div class="check-item" data-key="elm_c1_2"><span class="check-box"></span>מכתב בתוך תיבת הדואר</div>
+            <div class="check-item" data-key="elm_c1_3"><span class="check-box"></span>מפסק אדום בתוך השלט For Rent</div>
+            <div class="check-item" data-key="elm_c1_4"><span class="check-box"></span>קופסת כדורים, מכתב והספרה 4 מתחת לקבר</div>
+            <div class="check-item" data-key="elm_c1_5"><span class="check-box"></span>לבנה בצד ליד תא הטלפון</div>
+            <div class="check-item" data-key="elm_c1_6"><span class="check-box"></span>חתיכת בד בתוך הפח</div>
+            <div class="check-item" data-key="elm_c1_7"><span class="check-box"></span>תמונה של הקלאס בתוך הניקוז</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section animate-in">
+          <h2 class="section-title" style="margin-bottom: 16px;">🛏️ חדר 2 — חדר השינה</h2>
+          <div class="checklist animate-stagger">
+            <div class="check-item" data-key="elm_c2_1"><span class="check-box"></span>שלושת הדפים במגירות (אחד במגירה נעולה)</div>
+            <div class="check-item" data-key="elm_c2_2"><span class="check-box"></span>מפתח על הפוסטר על הקיר</div>
+            <div class="check-item" data-key="elm_c2_3"><span class="check-box"></span>בדולח בקופסת בלרינה, בקיר מאחורי הקרש, מחוץ לדלת ההפחדה</div>
+            <div class="check-item" data-key="elm_c2_4"><span class="check-box"></span>מנואלה בתוך משאית צעצוע</div>
+            <div class="check-item" data-key="elm_c2_5"><span class="check-box"></span>תיבת הצעצועים סגורה, פתק עם שם הלקוח בפנים</div>
+            <div class="check-item" data-key="elm_c2_6"><span class="check-box"></span>להוריד ראש פרדי, לתלות כובע</div>
+            <div class="check-item" data-key="elm_c2_7"><span class="check-box"></span>לחבר ידי הבובה על התקרה למגנטים, לב על הבטן</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section animate-in">
+          <h2 class="section-title" style="margin-bottom: 16px;">🔧 חדר 3 — הצינורות</h2>
+          <div class="checklist animate-stagger">
+            <div class="check-item" data-key="elm_c3_1"><span class="check-box"></span>לשים פנסים ככמות השחקנים</div>
+            <div class="check-item" data-key="elm_c3_2"><span class="check-box"></span>ליישר את הקו הלבן של השסתום</div>
+            <div class="check-item" data-key="elm_c3_3"><span class="check-box"></span>למחוק גיר על הלוח</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section animate-in">
+          <h2 class="section-title" style="margin-bottom: 16px;">🔥 חדר 4 — המשרפה</h2>
+          <div class="checklist animate-stagger">
+            <div class="check-item" data-key="elm_c4_1"><span class="check-box"></span>דלת תנור סגורה, מתגים מיושרים</div>
+            <div class="check-item" data-key="elm_c4_2"><span class="check-box"></span>מפתח מחובר למגנט למעלה, תינוק בכד</div>
+            <div class="check-item" data-key="elm_c4_3"><span class="check-box"></span>צופן תנור מתחת לבובה, מנעול נעול</div>
+            <div class="check-item" data-key="elm_c4_4"><span class="check-box"></span>כפפת פרדי תלויה בכלוב</div>
+            <div class="check-item" data-key="elm_c4_5"><span class="check-box"></span>כיסא גלגלים על המסילה, מוט מתכת מאחורי משענת</div>
+            <div class="check-item" data-key="elm_c4_6"><span class="check-box"></span>יד ורמז במשענת היד</div>
+            <div class="check-item" data-key="elm_c4_7"><span class="check-box"></span>דלת יציאה סגורה</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px; text-align: center;">
+          <button class="checklist-reset" style="background: var(--bg-card); border: 1px solid var(--border-dark); color: var(--text-muted); padding: 10px 20px; border-radius: var(--radius-md); cursor: pointer; font-family: var(--font-body); font-size: 0.82rem; transition: var(--transition);">
+            🔄 איפוס צ'קליסט
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end tabs-wrapper -->
+</main>
+
+<footer style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 0.78rem; border-top: 1px solid var(--border-dark); position:relative; z-index:1;">
+  פורטל מפעיל פנימי — לשימוש צוות בלבד
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
